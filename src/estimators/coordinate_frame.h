@@ -57,6 +57,9 @@ struct ManhattanWorldFrameEstimationOptions {
 Eigen::Vector3d EstimateGravityVectorFromImageOrientation(
     const Reconstruction& reconstruction,
     const double max_axis_distance = 0.05);
+    
+Eigen::Vector3d EstimateVerticalFromTurntableCameras(
+    const Reconstruction& reconstruction);
 
 // Estimate the coordinate frame of the reconstruction assuming a Manhattan
 // world by finding the major vanishing points in each image. This function

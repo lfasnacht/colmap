@@ -973,15 +973,15 @@ int RunModelOrientationAligner(int argc, char** argv) {
   options.AddRequiredOption("input_path", &input_path);
   options.AddRequiredOption("output_path", &output_path);
   options.AddDefaultOption("method", &method,
-                           "{MANHATTAN-WORLD, IMAGE-ORIENTATION}");
+                           "{MANHATTAN-WORLD, IMAGE-ORIENTATION, TURNTABLE}");
   options.AddDefaultOption("max_image_size",
                            &frame_estimation_options.max_image_size);
   options.Parse(argc, argv);
 
   StringToLower(&method);
-  if (method != "manhattan-world" && method != "image-orientation") {
+  if (method != "manhattan-world" && method != "image-orientation" && method != "turntable") {
     std::cout << "ERROR: Invalid `method` - supported values are "
-                 "'MANHATTAN-WORLD' or 'IMAGE-ORIENTATION'."
+                 "'MANHATTAN-WORLD', 'IMAGE-ORIENTATION' or 'TURNTABLE'."
               << std::endl;
     return EXIT_FAILURE;
   }
@@ -1011,6 +1011,10 @@ int RunModelOrientationAligner(int argc, char** argv) {
     const Eigen::Vector3d gravity_axis =
         EstimateGravityVectorFromImageOrientation(reconstruction);
     tform = RotationFromUnitVectors(gravity_axis, Eigen::Vector3d(0, 1, 0));
+  } else if (method == "turntable") {
+    const Eigen::Vector3d vertical_axis =
+        EstimateVerticalFromTurntableCameras(reconstruction);
+    tform = RotationFromUnitVectors(vertical_axis, Eigen::Vector3d(0, 0, -1));
   } else {
     LOG(FATAL) << "Alignment method not supported";
   }

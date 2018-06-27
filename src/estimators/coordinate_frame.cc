@@ -153,6 +153,22 @@ Eigen::Vector3d EstimateGravityVectorFromImageOrientation(
   return FindBestConsensusAxis(downward_axes, max_axis_distance);
 }
 
+Eigen::Vector3d EstimateVerticalFromTurntableCameras(
+    const Reconstruction& reconstruction) {
+  int image_count = 0;
+  Eigen::MatrixXd positions(3,reconstruction.NumRegImages());
+  for (const auto image_id : reconstruction.RegImageIds()) {
+    const auto& image = reconstruction.Image(image_id);
+    positions.col(image_count++) = image.ProjectionCenter();
+  }
+  
+  const auto M = positions * positions.transpose();
+  
+  return M.jacobiSvd(Eigen::ComputeFullU).matrixU().col(2);
+}
+
+
+
 Eigen::Matrix3d EstimateManhattanWorldFrame(
     const ManhattanWorldFrameEstimationOptions& options,
     const Reconstruction& reconstruction, const std::string& image_path) {
